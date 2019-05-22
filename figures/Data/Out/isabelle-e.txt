@@ -1,0 +1,9 @@
+Starting run  - #wildfly - Selective
+'Your VM is too old for this image. Please download the latest VM.'
+GCBenchEvaluatorV2
+Starting run  - #wildfly - Tracking
+'Your VM is too old for this image. Please download the latest VM.'
+GCBenchEvaluatorV2
+#wildfly -DONE
+Starting run  - #netBeans - Selective
+'Your VM is too old for this image. Please download the latest VM.'

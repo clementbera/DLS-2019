@@ -1,0 +1,476 @@
+Starting run  - #wildfly - Selective
+'Your VM is too old for this image. Please download the latest VM.'
+GCBenchEvaluatorV2
+Starting run  - #wildfly - Tracking
+'Your VM is too old for this image. Please download the latest VM.'
+GCBenchEvaluatorV2
+#wildfly -DONE
+Starting run  - #netBeans - Selective
+'Your VM is too old for this image. Please download the latest VM.'
+GCBenchEvaluatorV2
+Starting run  - #netBeans - Tracking
+'Your VM is too old for this image. Please download the latest VM.'
+
+Bus error Sun Oct  7 22:14:45 2018
+
+
+/home/clembera/SelectivePaperBench/SelectiveTrackingVM/squeak
+Squeak VM version: 5.0-$URL$  Sat Oct  6 21:34:36 CEST 2018 gcc 5.4.0 [Production Spur 64-bit VM]
+Built from: CoInterpreter * VMMaker.oscog-cb.2419 uuid: 7d60e922-f6a4-4659-9f35-87fcec6a3b93 Oct  6 2018
+With: StackToRegisterMappingCogit * VMMaker.oscog-cb.2419 uuid: 7d60e922-f6a4-4659-9f35-87fcec6a3b93 Oct  6 2018
+Revision: VM: $URL$ $Date$ Date: $Rev$ CommitHash: $URL$ Plugins:  $Rev$
+Build host: Linux clement-VirtualBox 4.15.0-34-generic #37~16.04.1-Ubuntu SMP Tue Aug 28 10:44:06 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+plugin path: /home/clembera/SelectivePaperBench/SelectiveTrackingVM/ [default: /home/clembera/SelectivePaperBench/SelectiveTrackingVM/]
+
+
+C stack backtrace & registers:
+	rax 0x676ce2c0 rbx 0x676ce150 rcx 0x676ce378 rdx 0x676ce208
+	rdi 0x676cdf28 rsi 0x676cdf28 rbp 0x676ce098 rsp 0x676ce430
+	r8  0x676cd968 r9  0x676cda20 r10 0x676cdad8 r11 0x676cdb90
+	r12 0x676cdc48 r13 0x676cdd00 r14 0x676cddb8 r15 0x676cde70
+	rip 0x676ce4e8
+*[0x7ffc676ce4e8]
+SelectiveTrackingVM/squeak[0x41b2cd]
+SelectiveTrackingVM/squeak[0x41cede]
+/lib/x86_64-linux-gnu/libpthread.so.0(+0x11390)[0x7f5ef2b2e390]
+SelectiveTrackingVM/squeak(markAndTrace+0x17b)[0x43e21b]
+SelectiveTrackingVM/squeak[0x43e665]
+SelectiveTrackingVM/squeak[0x4534ca]
+SelectiveTrackingVM/squeak(fullGC+0x46)[0x4577a6]
+SelectiveTrackingVM/squeak[0x458596]
+SelectiveTrackingVM/squeak(interpret+0xa39f)[0x4681ff]
+SelectiveTrackingVM/squeak[0x46973b]
+SelectiveTrackingVM/squeak(interpret+0x246)[0x45e0a6]
+SelectiveTrackingVM/squeak(main+0x2f8)[0x41a768]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf0)[0x7f5ef2773830]
+SelectiveTrackingVM/squeak(_start+0x29)[0x41aad9]
+[0x0]
+
+
+Smalltalk stack dump:
+    0x7ffc676dde78 I SmalltalkImage>garbageCollect 0x7b50c88: a(n) SmalltalkImage
+    0x7ffc676ddec0 I Array class(Behavior)>handleFailingBasicNew: 0x7734a28: a(n) Array class
+    0x7ffc676ddf00 M Array class(Behavior)>basicNew: 0x7734a28: a(n) Array class
+    0x7ffc676ddf38 M Array class>new: 0x7734a28: a(n) Array class
+    0x7ffc676ddf78 M OrderedCollection>growAtLast 0x6dea0c8: a(n) OrderedCollection
+    0x7ffc676ddfc0 M OrderedCollection>makeRoomAtLast 0x6dea0c8: a(n) OrderedCollection
+    0x7ffc676ddff0 M OrderedCollection>addLast: 0x6dea0c8: a(n) OrderedCollection
+    0x7ffc676de028 M OrderedCollection>add: 0x6dea0c8: a(n) OrderedCollection
+    0x7ffc676de078 M FAMIXClass(FAMIXNamedEntity)>atScope:in: 0x18fbfb150: a(n) FAMIXClass
+    0x7ffc676de0d0 M FAMIXMethod(FAMIXNamedEntity)>atScope:in: 0x1ac24cb58: a(n) FAMIXMethod
+    0x7ffc676de120 M OrderedCollection(Collection)>atScope:in: 0xb00702a0: a(n) OrderedCollection
+    0x7ffc676de160 M FMMultiMultivalueLink(FMMultivalueLink)>atScope:in: 0xbff1bd50: a(n) FMMultiMultivalueLink
+    0x7ffc676de1a8 M [] in MooseOutgoingQueryResult>atScope: 0x6d49f60: a(n) MooseOutgoingQueryResult
+    0x7ffc676de1f8 M [] in OrderedCollection(Collection)>inject:into: 0x6d49f78: a(n) OrderedCollection
+    0x7ffc676e9ce8 M OrderedCollection>do: 0x6d49f78: a(n) OrderedCollection
+    0x7ffc676e9d28 M OrderedCollection(Collection)>inject:into: 0x6d49f78: a(n) OrderedCollection
+    0x7ffc676e9d70 M MooseOutgoingQueryResult>atScope: 0x6d49f60: a(n) MooseOutgoingQueryResult
+    0x7ffc676e9da8 M FAMIXNamespace>providerTypes 0x18b5a2ae8: a(n) FAMIXNamespace
+    0x7ffc676e9de8 M [] in GCMooseBench>benchExpandProperties 0x9d4ab018: a(n) GCMooseBench
+    0x7ffc676e9e18 M BlockClosure>on:do: 0x4b9eba8: a(n) BlockClosure
+    0x7ffc676e9e60 M [] in GCMooseBench>benchExpandProperties 0x9d4ab018: a(n) GCMooseBench
+    0x7ffc676e9ea8 M OrderedCollection>do: 0x4b9e160: a(n) OrderedCollection
+    0x7ffc676e9ee0 M [] in GCMooseBench>benchExpandProperties 0x9d4ab018: a(n) GCMooseBench
+    0x7ffc676e9f28 M OrderedCollection>do: 0x1227fe78: a(n) OrderedCollection
+    0x7ffc676e9f70 I MooseGroupRuntimeStorage>do: 0x9d4abab0: a(n) MooseGroupRuntimeStorage
+    0x7ffc676e9fb8 I GCMooseBench>benchExpandProperties 0x9d4ab018: a(n) GCMooseBench
+    0x7ffc676ea000 I [] in GCBenchEvaluatorV2 class>run:project:trackingIndex:fileName: 0x108195c8: a(n) GCBenchEvaluatorV2 class
+    0x7ffc676ea048 I Time class>microsecondsToRun: 0x7733520: a(n) Time class
+    0x7ffc676ea090 I Time class>millisecondsToRun: 0x7733520: a(n) Time class
+    0x7ffc676ea0e0 I BlockClosure>timeToRun 0x6fdf2be8: a(n) BlockClosure
+    0x7ffc676ea128 I BlockClosure>timeToRunWithoutGC 0x6fdf2be8: a(n) BlockClosure
+    0x7ffc676ea168 I GCBenchEvaluatorV2>bench: 0x9d4ab060: a(n) GCBenchEvaluatorV2
+    0x7ffc676ea1e0 I GCBenchEvaluatorV2 class>run:project:trackingIndex:fileName: 0x108195c8: a(n) GCBenchEvaluatorV2 class
+    0x7ffc676e7d58 I GCBenchEvaluatorV2 class>runTracking:project: 0x108195c8: a(n) GCBenchEvaluatorV2 class
+    0x7ffc676e7d98 M UndefinedObject>DoIt 0x7485c80: a(n) UndefinedObject
+    0x7ffc676e7df8 I OpalCompiler>evaluate 0x9d4aa840: a(n) OpalCompiler
+    0x7ffc676e7e38 I OpalCompiler(AbstractCompiler)>evaluate: 0x9d4aa840: a(n) OpalCompiler
+    0x7ffc676e7e80 M [] in EvaluateCommandLineHandler>evaluate: 0x9d4aa8d0: a(n) EvaluateCommandLineHandler
+    0x7ffc676e7eb0 M BlockClosure>on:do: 0x9d4aa900: a(n) BlockClosure
+    0x7ffc676e7f08 I EvaluateCommandLineHandler>evaluate: 0x9d4aa8d0: a(n) EvaluateCommandLineHandler
+    0x7ffc676e7f58 I EvaluateCommandLineHandler>evaluateArguments 0x9d4aa8d0: a(n) EvaluateCommandLineHandler
+    0x7ffc676e7f98 I EvaluateCommandLineHandler>activate 0x9d4aa8d0: a(n) EvaluateCommandLineHandler
+    0x7ffc676e7fd8 I EvaluateCommandLineHandler class(CommandLineHandler class)>activateWith: 0x7b7d8d8: a(n) EvaluateCommandLineHandler class
+    0x7ffc676e8018 M [] in PharoCommandLineHandler(BasicCommandLineHandler)>activateSubCommand: 0x9d4aab78: a(n) PharoCommandLineHandler
+    0x7ffc676e8048 M BlockClosure>on:do: 0x9d4aaba0: a(n) BlockClosure
+    0x7ffc676e8088 M PharoCommandLineHandler(BasicCommandLineHandler)>activateSubCommand: 0x9d4aab78: a(n) PharoCommandLineHandler
+    0x7ffc676e80d8 I PharoCommandLineHandler(BasicCommandLineHandler)>handleSubcommand 0x9d4aab78: a(n) PharoCommandLineHandler
+    0x7ffc676e8118 I PharoCommandLineHandler(BasicCommandLineHandler)>handleArgument: 0x9d4aab78: a(n) PharoCommandLineHandler
+    0x7ffc676e8150 M [] in PharoCommandLineHandler(BasicCommandLineHandler)>activate 0x9d4aab78: a(n) PharoCommandLineHandler
+    0x7ffc676e8180 M BlockClosure>on:do: 0x9d4aae38: a(n) BlockClosure
+    0x7ffc676e81c0 M PharoCommandLineHandler(BasicCommandLineHandler)>activate 0x9d4aab78: a(n) PharoCommandLineHandler
+    0x7ffc676e8200 I PharoCommandLineHandler>activate 0x9d4aab78: a(n) PharoCommandLineHandler
+    0x7ffc676d1d78 I PharoCommandLineHandler class(CommandLineHandler class)>activateWith: 0x795a118: a(n) PharoCommandLineHandler class
+    0x7ffc676d1dc8 I [] in PharoCommandLineHandler class>activateWith: 0x795a118: a(n) PharoCommandLineHandler class
+    0x7ffc676d1e08 I NonInteractiveUIManager(UIManager)>defer: 0x12ab8690: a(n) NonInteractiveUIManager
+    0x7ffc676d1e50 I PharoCommandLineHandler class>activateWith: 0x795a118: a(n) PharoCommandLineHandler class
+    0x7ffc676d1e90 M [] in BasicCommandLineHandler>activateSubCommand: 0x9d4a9ae8: a(n) BasicCommandLineHandler
+    0x7ffc676d1ec0 M BlockClosure>on:do: 0x9d4a9b10: a(n) BlockClosure
+    0x7ffc676d1f10 I BasicCommandLineHandler>activateSubCommand: 0x9d4a9ae8: a(n) BasicCommandLineHandler
+    0x7ffc676d1f60 I BasicCommandLineHandler>handleSubcommand 0x9d4a9ae8: a(n) BasicCommandLineHandler
+    0x7ffc676d1fa0 I BasicCommandLineHandler>handleArgument: 0x9d4a9ae8: a(n) BasicCommandLineHandler
+    0x7ffc676d1fd8 M [] in BasicCommandLineHandler>activate 0x9d4a9ae8: a(n) BasicCommandLineHandler
+    0x7ffc676d2008 M BlockClosure>on:do: 0x9d4a9da8: a(n) BlockClosure
+    0x7ffc676d2058 I BasicCommandLineHandler>activate 0x9d4a9ae8: a(n) BasicCommandLineHandler
+    0x7ffc676d2088 M [] in BasicCommandLineHandler class>startUp: 0x795a050: a(n) BasicCommandLineHandler class
+    0x7ffc676d20b8 M BlockClosure>cull: 0x9d4a9ea0: a(n) BlockClosure
+    0x7ffc676d2108 I WorkingSession>executeDeferredStartupActions: 0x12ab6f98: a(n) WorkingSession
+    0x7ffc676d2150 I WorkingSession>runStartup: 0x12ab6f98: a(n) WorkingSession
+    0x7ffc676d2198 I WorkingSession>start: 0x12ab6f98: a(n) WorkingSession
+    0x7ffc676d21f0 I SessionManager>snapshot:andQuit: 0x96673b0: a(n) SessionManager
+        0x118f0720 s [] in SmalltalkImage>snapshot:andQuit:
+        0x11911328 s CurrentExecutionEnvironment class>activate:for:
+        0x1192db90 s DefaultExecutionEnvironment(ExecutionEnvironment)>beActiveDuring:
+        0x119636b8 s DefaultExecutionEnvironment class>beActiveDuring:
+        0x1192dc48 s SmalltalkImage>snapshot:andQuit:
+        0x11963770 s UndefinedObject>DoIt
+        0x1198c8f8 s OpalCompiler>evaluate
+        0x119b3998 s OpalCompiler(AbstractCompiler)>evaluate:
+        0x119e9248 s [] in EvaluateCommandLineHandler>evaluate:
+        0x11a1c308 s BlockClosure>on:do:
+        0x11a39968 s EvaluateCommandLineHandler>evaluate:
+        0x11a4c118 s EvaluateCommandLineHandler>evaluateArguments
+        0x11a62cd0 s EvaluateCommandLineHandler>activate
+        0x11a721a8 s EvaluateCommandLineHandler class(CommandLineHandler class)>activateWith:
+        0x11a7cc30 s [] in PharoCommandLineHandler(BasicCommandLineHandler)>activateSubCommand:
+        0x11a83f40 s BlockClosure>on:do:
+        0x11a88a30 s PharoCommandLineHandler(BasicCommandLineHandler)>activateSubCommand:
+        0x11a8cd88 s PharoCommandLineHandler(BasicCommandLineHandler)>handleSubcommand
+        0x11a8ef70 s PharoCommandLineHandler(BasicCommandLineHandler)>handleArgument:
+        0x11a90488 s [] in PharoCommandLineHandler(BasicCommandLineHandler)>activate
+        0x11a91820 s BlockClosure>on:do:
+        0x11a92968 s PharoCommandLineHandler(BasicCommandLineHandler)>activate
+        0x11a92ee8 s PharoCommandLineHandler>activate
+        0x11a93180 s PharoCommandLineHandler class(CommandLineHandler class)>activateWith:
+        0x11a93488 s [] in PharoCommandLineHandler class>activateWith:
+        0x11a938f8 s NonInteractiveUIManager(UIManager)>defer:
+        0x11a93a58 s PharoCommandLineHandler class>activateWith:
+        0x11a93ba8 s [] in BasicCommandLineHandler>activateSubCommand:
+        0x11a93dc0 s BlockClosure>on:do:
+        0x11a94198 s BasicCommandLineHandler>activateSubCommand:
+        0x11a94368 s BasicCommandLineHandler>handleSubcommand
+        0x11a944c0 s BasicCommandLineHandler>handleArgument:
+        0x11a94728 s [] in BasicCommandLineHandler>activate
+        0x11a94e28 s BlockClosure>on:do:
+        0x11a95170 s BasicCommandLineHandler>activate
+        0x11a953c8 s [] in BasicCommandLineHandler class>startUp:
+        0x11a95588 s BlockClosure>cull:
+        0x11a958c8 s WorkingSession>executeDeferredStartupActions:
+        0x11a95a58 s WorkingSession>runStartup:
+        0x11a95b30 s WorkingSession>start:
+        0x10a130d8 s SessionManager>snapshot:andQuit:
+        0x10a20988 s [] in SmalltalkImage>snapshot:andQuit:
+        0x10a320d0 s CurrentExecutionEnvironment class>activate:for:
+        0x10a39750 s DefaultExecutionEnvironment(ExecutionEnvironment)>beActiveDuring:
+        0x10a43db0 s DefaultExecutionEnvironment class>beActiveDuring:
+        0x10a39808 s SmalltalkImage>snapshot:andQuit:
+        0x10a43e68 s [] in WorldState class>saveAndQuit
+        0x10a51fc0 s BlockClosure>ensure:
+        0x10a7fb98 s CursorWithMask(Cursor)>showWhile:
+        0x10a7fc78 s WorldState class>saveAndQuit
+        0x10ab1740 s [] in ToggleMenuItemMorph(MenuItemMorph)>invokeWithEvent:
+        0x10afd988 s BlockClosure>ensure:
+        0x10b28b40 s CursorWithMask(Cursor)>showWhile:
+        0x10b28c20 s ToggleMenuItemMorph(MenuItemMorph)>invokeWithEvent:
+        0x10b723f0 s ToggleMenuItemMorph(MenuItemMorph)>mouseUp:
+        0x10b90218 s ToggleMenuItemMorph(MenuItemMorph)>handleMouseUp:
+        0x10baf048 s MouseButtonEvent>sentTo:
+        0x10bb1ec0 s ToggleMenuItemMorph(Morph)>handleEvent:
+        0x10bb3508 s MorphicEventDispatcher>dispatchDefault:with:
+        0x10bb4408 s MorphicEventDispatcher>handleMouseUp:
+        0x10bb5410 s MouseButtonEvent>sentTo:
+        0x10bb5d40 s [] in MorphicEventDispatcher>dispatchEvent:with:
+        0x10bb62e0 s BlockClosure>ensure:
+        0x10bb67d0 s MorphicEventDispatcher>dispatchEvent:with:
+        0x10bb6ae0 s ToggleMenuItemMorph(Morph)>processEvent:using:
+        0x10bb6d58 s MorphicEventDispatcher>dispatchDefault:with:
+        0x10bb6e10 s MorphicEventDispatcher>handleMouseUp:
+        0x10bb6f18 s MouseButtonEvent>sentTo:
+        0x10bb6fd0 s [] in MorphicEventDispatcher>dispatchEvent:with:
+        0x10bb7088 s BlockClosure>ensure:
+        0x10bb7168 s MorphicEventDispatcher>dispatchEvent:with:
+        0x10bb7240 s MenuMorph(Morph)>processEvent:using:
+        0x10bb72f8 s MenuMorph(Morph)>processEvent:
+        0x10bb73b0 s MenuMorph>handleFocusEvent:
+        0x10bb7468 s [] in HandMorph>sendFocusEvent:to:clear:
+        0x10bb7520 s BlockClosure>on:do:
+        0x10bb7620 s WorldMorph(PasteUpMorph)>becomeActiveDuring:
+        0x10bb7710 s HandMorph>sendFocusEvent:to:clear:
+        0x10bb7810 s HandMorph>sendEvent:focus:clear:
+        0x10bb7900 s HandMorph>sendMouseEvent:
+        0x10bb79b8 s HandMorph>handleEvent:
+        0x10bb7a70 s HandMorph>processEventsFromQueue:
+        0x10bb7b28 s HandMorph>processEvents
+        0x10bb7be0 s [] in WorldState>doOneCycleNowFor:
+        0x10bb7c98 s Array(SequenceableCollection)>do:
+        0x10bb7d70 s WorldState>handsDo:
+        0x10bb7e28 s WorldState>doOneCycleNowFor:
+        0x10bb7ee0 s WorldState>doOneCycleFor:
+        0x10bb7f98 s WorldMorph>doOneCycle
+        0x10bb8050 s WorldMorph class>doOneCycle
+        0x107e6288 s [] in MorphicUIManager>spawnNewProcess
+        0x107e6340 s [] in BlockClosure>newProcess
+
+Most recent primitives
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+indexOfAscii:inString:startingAt:
+indexOfAscii:inString:startingAt:
+**StackOverflow**
+shallowCopy
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+perform:
+**StackOverflow**
+compare:with:collated:
+compare:with:collated:
+compare:with:collated:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+stringHash:initialHash:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+findSubstring:in:startingAt:matchTable:
+perform:
+findSubstring:in:startingAt:matchTable:
+indexOfAscii:inString:startingAt:
+indexOfAscii:inString:startingAt:
+perform:
+basicNew
+perform:
+**StackOverflow**
+perform:
+perform:
+perform:
+new:
+new:
+new:
+perform:
+perform:
+perform:
+perform:
+perform:
+new:
+class
+perform:
+perform:
+perform:
+perform:
+new:
+perform:
+perform:
+perform:
+perform:
+perform:
+perform:
+perform:
+new:
+class
+perform:
+perform:
+perform:
+perform:
+perform:
+perform:
+perform:
+perform:
+perform:
+new:
+new:
+**StackOverflow**
+**StackOverflow**
+**StackOverflow**
+**StackOverflow**
+**StackOverflow**
+**StackOverflow**
+**StackOverflow**
+**StackOverflow**
+**StackOverflow**
+new:
+new:
+new:
+new:
+new:
+new:
+new:
+new:
+new:
+new:
+new:
+new:
+new:
+new:
+new:
+perform:
+**StackOverflow**
+**StackOverflow**
+**StackOverflow**
+**StackOverflow**
+perform:
+class
+**StackOverflow**
+new:
+new:
+**StackOverflow**
+new:
+**StackOverflow**
+new:
+new:
+new:
+class
+perform:
+new:
+**StackOverflow**
+new:
+class
+**StackOverflow**
+new:
+new:
+**StackOverflow**
+new:
+basicNew:
+handleFailingBasicNew:
+byteSizeOfInstanceOfSize:
+value:
+key
+value:value:
+**StackOverflow**
+at:
+basicAt:
+at:
+at:
+at:
+at:
+at:
+at:
+primitiveGarbageCollect
+**FullGC**
+
+stack page bytes 8192 available headroom 5576 minimum unused headroom 6008
+
+	(Bus error)
+runBenchmarks.sh: line 21: 21711 Aborted                 (core dumped) $VM -headless $BASE_IMAGE eval "GCBenchEvaluatorV2 runTracking: '$ITERATOR' project: $PROJECT2"
+#netBeans -DONE

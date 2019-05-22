@@ -1,0 +1,2 @@
+Starting run  - #wildfly - Tracking
+'Your VM is too old for this image. Please download the latest VM.'
