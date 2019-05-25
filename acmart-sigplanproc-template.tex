@@ -13,7 +13,7 @@
 %% Conference information
 %% Supplied to authors by publisher for camera-ready submission;
 %% use defaults for review submission.
-\acmConference[ISMM'19]{International Symposium on Memory Management}{June 23, 2019}{Phoenix, Arizona, USA}
+\acmConference[DLS'19]{Dynamic Languages Symposium}{October 22, 2019}{Athens, Greece}
 \acmYear{2019}
 \acmISBN{} % \acmISBN{978-x-xxxx-xxxx-x/YY/MM}
 \acmDOI{} % \acmDOI{10.1145/nnnnnnn.nnnnnnn}
@@ -317,7 +317,7 @@ Recent versions of Oracle's JVM feature a compacting GC as the default garbage c
 
 \paragraph{Our Solution.} 
 %In this paper, we propose an alternative solution to decrease compacting pauses on a heap split in multiple regions. During a stop the world pause, our compactor selects the least used regions for compaction, copies and compact their objects into a new region, typically compacting a small portion of the heap. 
-In this paper, we propose an alternative solution to decrease compaction pauses. During a stop the world pause, our GC compacts part of the heap and maintains a few invariants but does \emph{not} update at all references to moved objects in the heap. Instead, while compacting the GC replaces the previous location of the moved objects by low-overhead software forwarding objects~\cite{Forwarders}. Thanks to the invariants maintained during the stop the world pause, the forwarding objects do not require the mutator to use a read barrier in most memory reads. The forwarding objects are then lazily removed by the mark phase of the following garbage collection, which can be performed incrementally or concurrently. Our implementation solves the compaction pause problem met by one of our industrial user, and we describe in Section \ref{sec:validation} how we built benchmark derived from the industrial use-case to evaluate the compaction pauses. %Maintaining stack invariants to create forwarding objects implies however that our forwarding objects cannot be created atomically, forbidding current compaction.
+In this paper, we propose an alternative solution to decrease compaction pauses. During a stop the world pause, our GC compacts part of the heap and maintains a few invariants but does \emph{not} update at all references to moved objects in the heap. Instead, while compacting the GC replaces the previous location of the moved objects by low-overhead software forwarding objects~\cite{Forwarders}. Thanks to the invariants maintained during the stop the world pause, the forwarding objects do not require the mutator to use a read barrier in most memory reads. The forwarding objects are then lazily removed by the mark phase of the following garbage collection, which can be performed incrementally or concurrently. Our implementation solves the compaction pause problem met by one of our industrial user. We describe in Section \ref{sec:validation} how we built benchmarks derived from the industrial use-case to evaluate the compaction pauses. %Maintaining stack invariants to create forwarding objects implies however that our forwarding objects cannot be created atomically, forbidding current compaction.
 
 The contributions of this paper are:
 \begin{itemize}
@@ -981,8 +981,7 @@ In this experiment, we ran the same benchmarks as the previous subsection with t
 \section{Threats to Validity and Discussion}
 \label{sec:threats}
 
-In this section we discuss specific concerns which may threaten the validity of our evaluation, and why we think the validation is still very strong. Specifically we detail the representativity of our benchmarks, the different issues and work-arounds in the eager pointer update implementation and the compaction heuristics. 
-Then we discuss specific aspects of our approach, the memory pressure of the compacting algorithm and the applicability to other VMs.
+We believe the validation is very strong, but specific concerns may threaten its validity: the representativity of our benchmarks, the experimental eager pointer update implementation and the compaction heuristics. These aspects are detailed in this section. Then, we discuss the memory pressure of the compacting algorithm and the applicability of our approach to other VMs.
 
 \subsection{Threats to Validity}
 
