@@ -464,8 +464,6 @@ Object headers contain a class index (an index into a sparse table of classes) i
 \paragraph{Partial Read Barrier and Invariants.} 
 To intercept virtual calls to forwarding objects, the forwarding object class index is never entered in method lookup caches and look-ups to forwarding objects are never successful. When performing a virtual call, the VM checks if the receiver is a forwarding object only on cache miss and look-up failures, which are uncommon. By following\footnote{We call following a forwarding object the action of replacing a reference to the forwarding object to the object it forwards to.} the forwarding pointer on the uncommon path, the receiver is guaranteed not to be a forwarding object at method activation time. Effectively virtual call binding provides an implicit read barrier.
 
-\todo{Here 2.b Provide more details about the stack-invariant. -> What should I do? There is details in the ISMM paper and the paper is referenced, should I copy-paste a paragraph from that paper in addition? }
-
 To keep the read barrier partial, the VM maintains a set of invariants valid at all times except during the creation of forwarding objects. The key invariant is that the receiver of each frame on the stack is never a forwarding object. Another important invariant is that all methods references in method lookup caches are never forwarding objects.
 % \footnote{}.
 Thanks to these invariants, common operations other than virtual calls can also be performed without using a read barrier. For example, accessing instance variables of the receiver does not require a read barrier since the receiver is never a forwarding object.
@@ -734,8 +732,6 @@ Note that the \OpenSmalltalkVM features an interpreter and a template JIT, which
 %\paragraph{Runs.}
 To obtain results, we ran each benchmarks for each configuration \numRuns times, 3 times on each node. Benchmarking with the NetBeans workload takes a significant amount of time (around 4 hours per benchmark, on an evaluation with 2 configurations that gives us a total of 240 hours total cpu time, 24h on each node).
 %, we did not run the benchmarks more times to avoid wasting resources. 
-
-\todo{c. More details about the heap size and how authors measured heap size. -> That I can write}
 
 \subsection{Compaction Pause Time Experiments}
 
@@ -1043,7 +1039,6 @@ Recall that our algorithm picks memory regions to compact only based on occupati
 However, it matters in the case of eager pointer update. The high maximum pause time we have with eager pointer update in the benchmarks Load and Exp in the NetBeans workload come from large remembered tables. If the eager pointer update algorithm were to use different heuristics, for example, compacting the least occupied memory regions only if they have a small remembered table, the results may be different. 
 %But since this is not a constraint in our approach, we did not implement it.
 
-\todo{1.b Add a subsection that explains and discuss limitations and reasons about how the performance portability into systems with JIT implementation. -> What should I do? I do not get the question since we are already on a system with a JIT. I have a discussion paragraph about speculative optimizations which I had removed for space, I can put that back.}
 %REDUC DLS
 %\subsection{Allocation Folding in Optimizing JITs} 
 %\label{sec:optJITDisc}
@@ -1060,8 +1055,6 @@ However, it matters in the case of eager pointer update. The high maximum pause 
 %MOVED UP
 %In this section we discuss the memory pressure of our compacting algorithm and the applicability of our approach to other VMs. % and a few other details worth mentioning.
 
-\todo{a. How to guarantee very low-overhead when having bigger lookup caches. -> What should I do? I guess what they mean is when  look-up cache failure becomes common? I've never seen that happening.  I do not understand how lookup cache size and PRB are related. Should I explain that they are not?}
-
 \paragraph{Memory Pressure.}
 The compacting algorithm requires the VM to use extra memory regions. Indeed, some memory regions (The U regions in the Figure \ref{fig:Algo}) are used just to hold forwarding objects and unused memory while the mutator is running. These regions pressure the allocator and the VM uses a few more memory regions with the new algorithm. However, the number of extra memory region used is proportional to the number of compacted segments and can be bound, it is not proportional to the size of the heap. %REDUC DLS We therefore believe it is possible to make the new algorithm scale without too much trouble.
 
@@ -1074,7 +1067,6 @@ The compacting algorithm requires the VM to use extra memory regions. Indeed, so
 %This is orthogonal to the problem we tackle in this paper, i.e. to avoid having compaction pause depending on scanning remembered tables of variable sizes. We believe that our results would apply in the context of parallel compaction.
 
 \paragraph{Applicability to other Virtual Machines.}
-\todo{a. Explain the performance and portability of the partial read barrier based on lookup cache misses into other mainstream VMs. -> What should I do? The PRB is Smalltalk specific due to all calls being virtual and all accesses being to the receiver. I guess I can mention how it could work for Java hiding it behind null checks instead, but that's theoretical and non proven at all.}
 In order to apply our algorithm in mainstream VMs such as JavaScript and Java VMs, the algorithm needs to be parallelised and work with an optimizing JIT (as discussed before).
 %In the previous paragraphs we have already discussed that we believe the algorithm could be parallelised and could work with an optimizing JIT. 
 %Since we have not implemented lazy pointer update in this context, it has yet to be proven that our belief is correct. 
@@ -1148,7 +1140,7 @@ With Brooks' design, the first field of each object is reserved for a forwarding
 
 With Baker's design, each time a mutator reads an object, it checks if the address is in the range of object addresses being moved and if so, takes a slow path to read the correct object location. The read barrier has at least one branch, but in the common case it does not require an extra memory read. Baker-style read barriers usually have around a 20\% overhead after various optimizations on the runtime \cite{BarrierMethods}.
 %\end{description}
-\todo{Explain the similarities/difference with the Shenandoah GC. Why do you hold on to memory until the next garbage collection - where Shenandoah has a separate concurrent phase after the main pause? -> I can extend that paragraph. Last paper it was with the Pauseless GC because one reviewer understood Pauseless, now it's Shenandoah because one reviewer understands that one. }
+
 %Brooks forwarding pointers seem to be the most frequently used read barrier. 
 Some GCs with concurrent compaction use Brooks forwarding pointers~\cite{MetronomeIBMGC,RTGCBrooksReadBarrier,Shenandoah}.
 OpenJDK's Shenandoah \cite{Shenandoah} tries to mitigates Brooks forwarding pointer overhead through additional optimizations in the JIT which remove the read barriers. Such additional optimizations reduce the read barrier overhead from up to 40\% down to 10 or 20\% depending on benchmarks. In the Chicken and Clover GCs \cite{RTConcCompactGC}, the mutator uses Brooks forwarding pointers in Chicken, while it uses a conditional Baker-style read barrier in Clover.

@@ -1,6 +1,2 @@
-Ref -> change Dacapo ref to shorten -5
--> remove DOI.
-Sec 5 can be shorten. - 10 RM 5.4 ?
-Sec 6.2 - 3
-Sec 6.4 - 6 
-4.4 - results ?
+Read again sentence before contrib intro
+Read again sec Threats validaity and check flow
