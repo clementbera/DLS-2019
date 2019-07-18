@@ -698,7 +698,11 @@ We designed four main benchmarks, which can be used on different programs to ana
 %\end{enumerate}
 %\paragraph{Designed Benchmarks.} 
 
-\paragraph{Workloads Used.} Since the benchmarks work with a program to analyse, the specific program analysed has an important impact on the benchmarks. Specifically, the size of the heap during the benchmarks is highly dependent on the size of the program analysed. In this paper, we ran the benchmarks with two Java projects, WildFly and NetBeans, which grow the heap from the base runtime of 300Mb to 3Gb and 14Gb respectively. Table \ref{tab:workloadSize} gives approximate workload sizes for the four benchmarks on the two projects. %SSIZE REDUCTION The Load benchmark grows the heap from 300Mb to respectively 2Gb and 8 Gb. The Exp benchmark grows the heap a bit more, to respectively 3Gb and 14Gb. The ExpCache benchmark does not change the size of the heap. The Release benchmark shrinks the heap back down to 300Mb.
+\paragraph{Workloads Used.} Since the benchmarks work with a program to analyse, the specific program analysed has an important impact on the benchmarks. Specifically, the size of the heap during the benchmarks is highly dependent on the size of the program analysed. In this paper, we ran the benchmarks with two Java projects, WildFly and NetBeans, which grow the heap from the base runtime of 300Mb to 3Gb and 14Gb respectively. Table \ref{tab:workloadSize} gives approximate workload sizes for the four benchmarks on the two projects. 
+%\todo{2. c. More details about the heap size and how authors measured heap size. -> That I can write}
+
+The heap size measured includes all the memory used by the different heap regions. It includes unused space in each region, if any. It excludes the memory region used by the just-in-time compiler to hold generated machine code, as well as the memory regions used used by the C code of the VM outside of the heap (executable compiled C code, C global variables, etc.).
+%SSIZE REDUCTION The Load benchmark grows the heap from 300Mb to respectively 2Gb and 8 Gb. The Exp benchmark grows the heap a bit more, to respectively 3Gb and 14Gb. The ExpCache benchmark does not change the size of the heap. The Release benchmark shrinks the heap back down to 300Mb.
 
 \begin{table} [th]
 \centering
@@ -734,8 +738,6 @@ Note that the \OpenSmalltalkVM features an interpreter and a template JIT, which
 %\paragraph{Runs.}
 To obtain results, we ran each benchmarks for each configuration \numRuns times, 3 times on each node. Benchmarking with the NetBeans workload takes a significant amount of time (around 4 hours per benchmark, on an evaluation with 2 configurations that gives us a total of 240 hours total cpu time, 24h on each node).
 %, we did not run the benchmarks more times to avoid wasting resources. 
-
-\todo{c. More details about the heap size and how authors measured heap size. -> That I can write}
 
 \subsection{Compaction Pause Time Experiments}
 
@@ -1043,16 +1045,23 @@ Recall that our algorithm picks memory regions to compact only based on occupati
 However, it matters in the case of eager pointer update. The high maximum pause time we have with eager pointer update in the benchmarks Load and Exp in the NetBeans workload come from large remembered tables. If the eager pointer update algorithm were to use different heuristics, for example, compacting the least occupied memory regions only if they have a small remembered table, the results may be different. 
 %But since this is not a constraint in our approach, we did not implement it.
 
-\todo{1.b Add a subsection that explains and discuss limitations and reasons about how the performance portability into systems with JIT implementation. -> What should I do? I do not get the question since we are already on a system with a JIT. I have a discussion paragraph about speculative optimizations which I had removed for space, I can put that back.}
-%REDUC DLS
-%\subsection{Allocation Folding in Optimizing JITs} 
-%\label{sec:optJITDisc}
-%A final threat to validity is the effect of the JIT compiler.
-%The \OpenSmalltalkVM JIT compiler is a template-based JIT compiler, similar to the C1 Java hotspot compiler or to the FullCodeGen V8 JavaScript JIT compiler. 
-%It includes some optimizations a few which remove some object allocations in specific cases. 
-%%Since it has been the production JIT for a long time, minor optimizations have been implemented on top, including a few which remove some object allocations in specific cases. However, we do not claim our JIT competes with the production JITa of VMs such as the Java HotSpot C2 compiler, or the JavaScript V8 CrankShaft/Turbofan compilers. 
-%However, JITs of VMs such as the Java HotSpot C2 compiler, or the JavaScript V8 CrankShaft/Turbofan compilers perform much more aggressive optimizations, which can lead in some methods to avoiding entirely the allocation of some objects in the common execution path. 
-%In this context, object demography might differ from what we observe and the impact on compaction pauses has yet to be confirmed as being similar. However, in practice such optimizing JITs remove mainly (if not only) allocations of short-lived objects, which do not escape an optimization unit. Short-lived objects usually never survive until they are moved to old space, so the impact on the old space collector should be minimal.%\eem{I think this is by definition; in the Moose case the long lived objects comprising the object graph are the results of the computation, and by definition an optimizing JIT must not change the result of a computation, only poroduce the same result quicker ;-)}
+%\todo{1.b Add a subsection that explains and discuss limitations and reasons about how the performance portability into systems with JIT implementation. -> What should I do? I do not get the question since we are already on a system with a JIT. I have a discussion paragraph about speculative optimizations which I had removed for space, I can put that back.}
+
+\subsection{Optimizing JITs} 
+\label{sec:optJITDisc}
+A final threat to validity is the effect of the JIT compiler. The \OpenSmalltalkVM JIT compiler is essentially a template-based JIT compiler. 
+It includes some optimizations a few which remove some object allocations in specific cases, but very limited code hoisting outside of loops. 
+%Since it has been the production JIT for a long time, minor optimizations have been implemented on top, including a few which remove some object allocations in specific cases. However, we do not claim our JIT competes with the production JITa of VMs such as the Java HotSpot C2 compiler, or the JavaScript V8 CrankShaft/Turbofan compilers. 
+
+Some JITs, such as the Java Hotspot C2 compiler or the JavaScript V8 CrankShaft/Turbofan compilers perform much more aggressive optimizations, which can lead in some methods to avoiding entirely the allocation of some objects in the common execution path and to hoist ahead of loops a significant number of instructions.
+
+\paragraph{Allocation folding.}
+Object demography might differ from what we observe with such JITs and the impact on compaction pauses has yet to be confirmed as being similar. However, in practice such optimizing JITs remove mainly (if not only) allocations of short-lived objects, which do not escape an optimization unit. Short-lived objects usually never survive until they are moved to old space, so the impact on the old space collector should be minimal.
+
+\paragraph{Loop invariant code motion.}
+\cba{I do not like this, let's check if we need that in the review}
+Moving code ahead of loop, such as instruction testing if an object is a forwarding object to avoid paying a read barrier cost is possible and would limit the advantages of our implementation. Indeed the partial read barrier allows to save the forwarding object test time, which is also saved by testing it ahead of the loop. However, in high-level languages such as Java or Smalltalk, loops typically need to check for interrupts. Interrupts can lead to thread switch and the use of debugging capabilities or reflection, which may invalidate the code being hoisted. This limits the possibility of hoisting read barriers checks ahead of loops.
+%\eem{I think this is by definition; in the Moose case the long lived objects comprising the object graph are the results of the computation, and by definition an optimizing JIT must not change the result of a computation, only poroduce the same result quicker ;-)}
 
 \subsection{Discussion}
 \label{sec:discussion}
@@ -1060,7 +1069,10 @@ However, it matters in the case of eager pointer update. The high maximum pause 
 %MOVED UP
 %In this section we discuss the memory pressure of our compacting algorithm and the applicability of our approach to other VMs. % and a few other details worth mentioning.
 
-\todo{a. How to guarantee very low-overhead when having bigger lookup caches. -> What should I do? I guess what they mean is when  look-up cache failure becomes common? I've never seen that happening.  I do not understand how lookup cache size and PRB are related. Should I explain that they are not?}
+%\todo{a. How to guarantee very low-overhead when having bigger lookup caches. -> What should I do? I guess what they mean is when  look-up cache failure becomes common? I've never seen that happening.  I do not understand how lookup cache size and PRB are related. Should I explain that they are not?}
+
+\paragraph{Large look-up caches.}
+The virtual machine caches look-up results essentially using inline caches~\cite{PICSelf}. Inline caches can be monomorphic (a single type to test), polymorphic (up to 6 cases to test) or megamorphic (the VM attempts three times to find the result using a hash based logic). If the look-up is not resolved in the inline cache, the VM tries up to three times to find the result in a global look-up cache using a hash based logic. If this fails again, the VM performs a look-up algorithm and only if no method is found (the method to find is not implemented), the test against forwarding objects is performed. Results found on inline cache misses are used to update the inline cache. Results found on global look-up cache misses are also used to update the global look-up cache. Although the time spent in the partial read barrier depends on the current inline cache state, the time spent is bounded to a fixed number of test, the worst case being six tests in the polymorphic inline cache and three checks in the global look-up cache. 
 
 \paragraph{Memory Pressure.}
 The compacting algorithm requires the VM to use extra memory regions. Indeed, some memory regions (The U regions in the Figure \ref{fig:Algo}) are used just to hold forwarding objects and unused memory while the mutator is running. These regions pressure the allocator and the VM uses a few more memory regions with the new algorithm. However, the number of extra memory region used is proportional to the number of compacted segments and can be bound, it is not proportional to the size of the heap. %REDUC DLS We therefore believe it is possible to make the new algorithm scale without too much trouble.
