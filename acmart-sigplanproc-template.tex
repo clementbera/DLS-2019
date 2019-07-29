@@ -464,7 +464,7 @@ Object headers contain a class index (an index into a sparse table of classes) i
 \paragraph{Partial Read Barrier and Invariants.} 
 To intercept virtual calls to forwarding objects, the forwarding object class index is never entered in method lookup caches and look-ups to forwarding objects are never successful. When performing a virtual call, the VM checks if the receiver is a forwarding object only on cache miss and look-up failures, which are uncommon. By following\footnote{We call following a forwarding object the action of replacing a reference to the forwarding object to the object it forwards to.} the forwarding object on the uncommon path, the receiver is guaranteed not to be a forwarding object at method activation time. Effectively virtual call binding provides an implicit read barrier.
 
-To keep the read barrier partial, the VM maintains a set of invariants valid at all times except during the creation of forwarding objects~\cite{Forwarders}. Specific fields on stack (a subset of the fields in non optimized frames, and all fields in optimized frames) are scanned and forwarding objects found are updated. Besides the stack, specific fixed-sized structures known by the VM need to be scanned for forwarding objects. These structures are specific interpreter variables, objects related to process scheduling and fixed-sized caches. 
+To keep the read barrier partial, the VM maintains a set of invariants valid at all times except during the creation of forwarding objects~\cite{Forwarders}. Specific fields on stack referencing the frame's receiver or the compiled code object holding the bytecode executed by the interpeter are scanned and forwarding objects found are updated. Besides the stack, specific fixed-sized structures known by the VM need to be scanned for forwarding objects. These structures are specific interpreter variables, objects related to process scheduling and fixed-sized caches. 
 
 The total execution time spent to maintain these invariants is bounded. The stack has a fixed size: when no more space is available, least recently used stack pages are serialized on heap. Serialized pages are checked for forwarding objects during materialization and not during forwarding object creation. The only variable size structure scanned during forwarding object creation is the list of running processes (Processes are represented as objects and cannot be forwarding objects), which is usually a small list. No structure scanned is proportional to the heap size.
 
@@ -635,16 +635,21 @@ In this section, we first give an overview of the validation and discuss the ben
 
 In this paper we claim that (1) not updating pointers during compaction pauses decreases significantly the pause times and (2) that the overhead introduced by the forwarding objects of our approach is very limited. To validate these claims, we need to compare our approach against another approach which updates pointers during the compaction pause and does not introduce forwarding objects similar to Garbage First \cite{G1}. 
 %Such a competitive approach is very similar to Garbage First \cite{G1}. We however built our approach on top of existing work \cite{Forwarders}, re-using the same framework, \OpenSmalltalkVM. 
-Since there is no such a thing as a Garbage First implementation in \OpenSmalltalkVM, we built a poor man's version of it. 
-\footnote{One may wonder why the new algorithm was not implemented and evaluated in the JVM context, e.g. in Jikes RVM. We did not consider pursuing this evaluation strategy because (1) Jikes is currently 32 bits only, making it impossible to conduct experiments on the size of heaps we target (over 10 Gb), 
+Since there is no such a thing as a Garbage First implementation in \OpenSmalltalkVM, we built a poor man's version of it\footnote{%One may wonder why the new algorithm was not implemented and evaluated in the JVM context, e.g. in Jikes RVM. 
+%We did not consider pursuing this evaluation strategy 
+We did not evaluate our approach Jikes RVM, typically used for high performance GC evaluation, because Jikes is currently 32 bits only, forbidding experiments on 10Gb heaps, %making it impossible to conduct experiments on the size of heaps we target %(over 10 Gb), 
 %forbidding the use of heaps over 10Gb for evaluation%and as such it is not possible to conduct experiments on the size of heaps we target in this paper
-and (2) it does not feature the partial read barrier described in~\cite{Forwarders} we built upon, which would need to be re-implemented.}
-In the next two paragraphs we briefly describe the two approaches compared, our approach, that we call lazy pointer update, and the competitive, Garbage First style approach, that we call eager pointer update.
+and it does not feature the partial read barrier described in~\cite{Forwarders} we built upon, which would need to be re-implemented.}.
+In the next paragraphs we briefly describe the two approaches compared, our approach, %that we call 
+lazy pointer update, and %the competitive, 
+Garbage First style approach, %that we call 
+eager pointer update.
 
 \textbf{Lazy pointer update} is our approach where part of the heap is compacted during the compaction pause, but references to moved objects are updated lazily outside of the compaction pause. 
 
-\textbf{Eager pointer update} emulates an implementation of the closest related work, i.e a Garbage First style approach where part of the heap is compacted but the references to moved objects are also updated during the compaction pause. Pointer update is performed using a per memory region remembered table. The table holds addresses of references from other memory regions to objects inside the region. Since this algorithm is used only as a reference, the remembered tables are computed during the compaction pause, and the time spent for their computation is then subtracted from the pause. In practice, they are implemented in Garbage First through fine-tuned write barriers that we could not easily emulate. We implemented eager pointer update in such a way because we believe it approximates a theoretical optimal pointer update phase in terms of execution time. %, \ie we believe the pointer update phase can hardly be quicker to execute that this implementation. 
-Further details on the eager pointer update implementation are mentioned in Section \ref{sec:expPU}. 
+\textbf{Eager pointer update} emulates an implementation of the closest related work, a Garbage First style approach where part of the heap is compacted but the references to moved objects are also updated during the compaction pause. Pointer update is performed using a per memory region remembered table. The table holds addresses of references from other memory regions to objects inside the region. Since this algorithm is used only as a reference, the remembered tables are computed during the compaction pause, and the time spent for their computation is then subtracted from the pause. In practice, they are implemented in Garbage First through fine-tuned write barriers that we could not easily emulate. We believe this implementation of eager pointer update approximates a theoretical optimal pointer update phase in terms of execution time (details in Section \ref{sec:expPU}).%, \ie we believe the pointer update phase can hardly be quicker to execute that this implementation. 
+%Further details %on the eager pointer update implementation 
+%are mentioned in Section \ref{sec:expPU}. 
 
 %egb{following text cuts the flow and belongs to a discussion section if you want to keep it}
 %One way to look at eager pointer update is that it first performs the lazy pointer update algorithm, then updates references to moved objects. Hence eager pointer update is necessarily worse in term of execution time than lazy pointer update.
@@ -920,7 +925,7 @@ In the WildFly workload, the Load and Exp benchmarks have worst pauses that are 
 	\caption*{NetBeans 14 Gb Workload\vspace{-0cm}}
 	\end{subfigure}	   
 	\vspace{-0.3cm}
-	\caption{Execution time without GC\vspace{-0.2cm}}
+	\caption{Execution time without GC\vspace{-0.3cm}}
 	\label{fig:execTime}
 \end{figure*}
 
@@ -1057,14 +1062,16 @@ However, it matters in the case of eager pointer update. The high maximum pause 
 
 \subsection{Optimizing JITs} 
 \label{sec:optJITDisc}
-A final threat to validity is the effect of the JIT compiler. The \OpenSmalltalkVM JIT compiler is essentially a template-based JIT compiler. The VM also features a JIT with speculative optimizations, but it is available only under an experimental flag. The template JIT, aside from very specific cases, does not remove object allocations. 
+A final threat to validity is the effect of the JIT compiler. The \OpenSmalltalkVM JIT compiler is essentially a template-based JIT compiler. The template JIT, aside from very specific cases, does not remove object allocations. 
 %or perform loop invariant code motion. 
 %Since it has been the production JIT for a long time, minor optimizations have been implemented on top, including a few which remove some object allocations in specific cases. However, we do not claim our JIT competes with the production JITa of VMs such as the Java HotSpot C2 compiler, or the JavaScript V8 CrankShaft/Turbofan compilers. 
 
 Some JITs, such as the Java Hotspot C2 compiler or the JavaScript V8 CrankShaft/Turbofan compilers perform much more aggressive optimizations, which can lead in some methods to avoiding entirely the allocation of some objects in the common execution path and to hoist ahead of loops a significant number of instructions.
 
 %\paragraph{Allocation folding.}
-Object demography might differ from what we observe with such JITs and the impact on compaction pauses has yet to be confirmed as being similar. However, in practice such optimizing JITs remove mainly (if not only) allocations of short-lived objects, which do not escape an optimization unit. Short-lived objects usually never survive until they are moved to old space, so the impact on the old space collector should be minimal. Early experiments with our experimental speculative optimizer seem to confirm this theory.
+Object demography might differ from what we observe with such JITs and the impact on compaction pauses has yet to be confirmed as being similar. However, in practice such optimizing JITs remove mainly (if not only) allocations of short-lived objects, which do not escape an optimization unit. Short-lived objects usually never survive until they are moved to old space, so the impact on the old space collector should be minimal. 
+
+%\OpenSmalltalkVM also features a JIT with speculative optimizations, but it is available only under an experimental flag.  Early experiments with our experimental speculative optimizer seem to confirm this theory.
 
 %\paragraph{Loop invariant code motion.}
 %Moving code ahead of a loop, such as an instruction sequence testing if an object is a forwarding object to avoid paying a read barrier cost is possible and would limit the advantages of the partial read barrier. Indeed, the partial read barrier allows to avoid paying the read barrier cost by doing it implicitly in look-up caches, and that is not needed 
@@ -1105,7 +1112,7 @@ In addition, the algorithm relies on the partial read barrier to have efficient 
 
 Although we believe it is possible to implement such the partial read barrier for other languages, it has yet to be proven. The partial read barrier relies on folding the read barrier in uncommon paths to avoid paying its cost in the common case. In the context of virtual calls, the read barrier is folded in \OpenSmalltalkVM into the look-up cache miss uncommon path. Since in Smalltalk most operations are performed through virtual calls, the read barrier is implicit and overhead-free in the common case. 
 
-Porting the partial read barrier to other languages requires to design efficient ways of folding the read barrier into the uncommon paths of each operation accessing memory. In the example of Java, various method calls (private method calls, static calls, constructor calls) are performed without a look-up. The approach of folding the read barrier in the uncommon path of look-up cache miss to guarantee that the receiver is not a forwarding object is therefore not possible. However, such calls also feature a slower uncommon path. Private method calls take a slower uncommon path when the receiver is null, static and constructor call take a slow path when the class implementing the method called needs to be loaded and initialized. Besides calls, direct accesses to non receiver instance variables, accessing memory, is possible in Java. Such accesses are also performed with a slow path (null check). It may be possible to fold the read barrier into the slow path of calls and instance variable accesses in Java. It may also be possible not to implement the read barrier in specific cases (static methods cannot access a receiver's fields, so no read barrier seems to be needed).
+Porting the partial read barrier to other languages requires to design efficient ways of folding the read barrier into the uncommon paths of each operation accessing memory. In the example of Java, various method calls (private method calls, static calls, constructor calls) are performed without a look-up. The approach of folding the read barrier in the uncommon path of look-up cache miss to guarantee that the receiver is not a forwarding object is therefore not possible. However, such calls also feature a slower uncommon path: private method calls take a slow path when the receiver is null, static and constructor call when the class implementing the method called needs to be loaded and initialized. Besides calls, accesses to non receiver instance variables is possible in Java. Such accesses are also performed with a slow path (null check). Porting the partial read barrier to Java requires to find a solution to fold the read barrier also in slow paths such as null checks and maybe ignoring the read barrier for some calls (static methods cannot access a receiver's fields, so no read barrier seems to be needed).
 
 %REDUC DLS
 %\subsection{Implementation Considerations}
@@ -1172,10 +1179,12 @@ With Brooks' design, the first field of each object is reserved for a forwarding
 
 With Baker's design, each time a mutator reads an object, it checks if the address is in the range of object addresses being moved and if so, takes a slow path to read the correct object location. The read barrier has at least one branch, but in the common case it does not require an extra memory read. Baker-style read barriers usually have around a 20\% overhead after various optimizations on the runtime \cite{BarrierMethods}.
 %\end{description}
-\todo{Explain the similarities/difference with the Shenandoah GC. Why do you hold on to memory until the next garbage collection - where Shenandoah has a separate concurrent phase after the main pause? -> I can extend that paragraph. Last paper it was with the Pauseless GC because one reviewer understood Pauseless, now it's Shenandoah because one reviewer understands that one. }
+%\todo{Explain the similarities/difference with the Shenandoah GC. Why do you hold on to memory until the next garbage collection - where Shenandoah has a separate concurrent phase after the main pause? -> I can extend that paragraph. Last paper it was with the Pauseless GC because one reviewer understood Pauseless, now it's Shenandoah because one reviewer understands that one. }
 %Brooks forwarding pointers seem to be the most frequently used read barrier. 
 Some GCs with concurrent compaction use Brooks forwarding pointers~\cite{MetronomeIBMGC,RTGCBrooksReadBarrier,Shenandoah}.
 OpenJDK's Shenandoah \cite{Shenandoah} tries to mitigates Brooks forwarding pointer overhead through additional optimizations in the JIT which remove the read barriers. Such additional optimizations reduce the read barrier overhead from up to 40\% down to 10 or 20\% depending on benchmarks. In the Chicken and Clover GCs \cite{RTConcCompactGC}, the mutator uses Brooks forwarding pointers in Chicken, while it uses a conditional Baker-style read barrier in Clover.
+
+In Shenandoah~\cite{Shenandoah}, a concurrent GC phase starts to update the pointers to moved objects once compaction is finished. This approach contrasts with our implementation, where the GC holds to memory until the end of the next GC marking phase. We implemented our approach in such way because the marking phase was already removing forwarding objects, so it could remove the extra forwarding objects created by the GC with very limited GC throughput overhead. The throughput overhead is mitigated in Shenandoah by using concurrent GC threads and their approach saves a bit of memory in between compacting GCs.
 
 \paragraph{Software Write Barrier.}
 P. Cheng and G. E. Blelloch \cite{WBConcCompactNew} implemented a concurrent compactor inspired by Baker's read barrier \cite{BakerReadBarrier}, but based on the work of Scott Nettles and James O Toole \cite{WBConcCompactOld}; they moved the invariant from the to-space to the from-space, allowing the use of a write barrier instead of a read barrier. 
