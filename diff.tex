@@ -1,7 +1,7 @@
 %% For double-blind review submission, w/o CCS and ACM Reference (max submission space)
 %DIF LATEXDIFF DIFFERENCE FILE
 %DIF DEL submission1Round.tex              Sat May 25 10:23:13 2019
-%DIF ADD acmart-sigplanproc-template.tex   Mon Jul 29 14:26:05 2019
+%DIF ADD acmart-sigplanproc-template.tex   Mon Jul 29 14:42:39 2019
 \documentclass[sigplan,10pt,review,anonymous]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
 %% For double-blind review submission, w/ CCS and ACM Reference
 %\documentclass[sigplan,review,anonymous]{acmart}\settopmatter{printfolios=true}
@@ -503,13 +503,13 @@ Object headers contain a class index (an index into a sparse table of classes) i
 \paragraph{Partial Read Barrier and Invariants.} 
 To intercept virtual calls to forwarding objects, the forwarding object class index is never entered in method lookup caches and look-ups to forwarding objects are never successful. When performing a virtual call, the VM checks if the receiver is a forwarding object only on cache miss and look-up failures, which are uncommon. By following\footnote{We call following a forwarding object the action of replacing a reference to the forwarding object to the object it forwards to.} the forwarding \DIFdelbegin \DIFdel{pointer }\DIFdelend \DIFaddbegin \DIFadd{object }\DIFaddend on the uncommon path, the receiver is guaranteed not to be a forwarding object at method activation time. Effectively virtual call binding provides an implicit read barrier.
 
-To keep the read barrier partial, the VM maintains a set of invariants valid at all times except during the creation of forwarding objects\DIFdelbegin \DIFdel{. The key invariant is that the receiver of each frameon the stack is never a forwarding object. Another important invariant is that all methods references in method lookup caches are never forwarding objects.
-}\DIFdelend \DIFaddbegin \DIFadd{~\mbox{%DIFAUXCMD
+To keep the read barrier partial, the VM maintains a set of invariants valid at all times except during the creation of forwarding objects\DIFaddbegin \DIFadd{~\mbox{%DIFAUXCMD
 \cite{Forwarders}}\hspace{0pt}%DIFAUXCMD
-. Specific fields on stack referencing the frame's receiver or the compiled code object holding the bytecode executed by the interpeter are scanned and forwarding objects found are updated. Besides the stack, specific fixed-sized structures known by the VM need to be scanned for forwarding objects. These structures are specific interpreter variables, objects related to process scheduling and fixed-sized caches. 
-}
+. Specific fields on stack referencing the frame's receiver or the compiled code object holding the bytecode executed by the interpeter are scanned and forwarding objects found are updated. Besides the stack, specific fixed-sized structures known by the VM need to be scanned for forwarding objects. These structures are specific interpreter variables, objects related to process scheduling and fixed-sized caches}\DIFaddend . 
+\DIFdelbegin \DIFdel{The key invariant is that the receiver of each frameon the stack is never a forwarding object. Another important invariant is that all methods references in method lookup cachesare never forwarding objects .
+}\DIFdelend \DIFaddbegin 
 
-\DIFadd{The total execution time spent to maintain these invariants is bounded. The stack has a fixed size: when no more space is available, least recently used stack pages are serialized on heap. Serialized pages are checked for forwarding objects during materialization and not during forwarding object creation. The only variable size structure scanned during forwarding object creation is the list of running processes (Processes are represented as objects and cannot be forwarding objects), which is usually a small list. No structure scanned is proportional to the heap size.
+\DIFadd{The total execution time spent to maintain these invariants is bounded. The stack has a fixed size: when no more space is available, least recently used stack pages are serialized on heap. Serialized pages are checked for forwarding objects during materialization and not during forwarding object creation. The only variable size structure scanned during forwarding object creation is the list of running processes, which is usually a small list. No structure scanned is proportional to the heap size.
 }
 
 %DIF > all the compiled code and class objects referenced by the look-up caches cannot be forwarding objects. Last
@@ -1131,7 +1131,7 @@ However, it matters in the case of eager pointer update. The high maximum pause 
 %DIF < In this context, object demography might differ from what we observe and the impact on compaction pauses has yet to be confirmed as being similar. However, in practice such optimizing JITs remove mainly (if not only) allocations of short-lived objects, which do not escape an optimization unit. Short-lived objects usually never survive until they are moved to old space, so the impact on the old space collector should be minimal.%\eem{I think this is by definition; in the Moose case the long lived objects comprising the object graph are the results of the computation, and by definition an optimizing JIT must not change the result of a computation, only poroduce the same result quicker ;-)}
 %DIF > \todo{1.b Add a subsection that explains and discuss limitations and reasons about how the performance portability into systems with JIT implementation. -> What should I do? I do not get the question since we are already on a system with a JIT. I have a discussion paragraph about speculative optimizations which I had removed for space, I can put that back.}
 
-\DIFaddbegin \subsection{\DIFadd{Optimizing JITs}} 
+\subsection{Optimizing JITs}
 \label{sec:optJITDisc}
 \DIFadd{A final threat to validity is the effect of the JIT compiler. The }\OpenSmalltalkVM \DIFadd{JIT compiler is essentially a template-based JIT compiler. The template JIT, aside from very specific cases, does not remove object allocations. 
 %DIF > or perform loop invariant code motion. 
@@ -1192,7 +1192,7 @@ In addition, the algorithm relies on the partial read barrier to have efficient 
 \DIFadd{Although we }\DIFaddend believe it is possible to implement such \DIFdelbegin \DIFdel{a design }\DIFdelend \DIFaddbegin \DIFadd{the partial read barrier }\DIFaddend for other languages, it has yet to be proven. \DIFaddbegin \DIFadd{The partial read barrier relies on folding the read barrier in uncommon paths to avoid paying its cost in the common case. In the context of virtual calls, the read barrier is folded in }\OpenSmalltalkVM \DIFadd{into the look-up cache miss uncommon path. Since in Smalltalk most operations are performed through virtual calls, the read barrier is implicit and overhead-free in the common case. 
 }\DIFaddend 
 
-\DIFaddbegin \DIFadd{Porting the partial read barrier to other languages requires to design efficient ways of folding the read barrier into the uncommon paths of each operation accessing memory. In the example of Java, various method calls (private method calls, static calls, constructor calls) are performed without a look-up. The approach of folding the read barrier in the uncommon path of look-up cache miss to guarantee that the receiver is not a forwarding object is therefore not possible. However, such calls also feature a slower uncommon path: private method calls take a slow path when the receiver is null, static and constructor call when the class implementing the method called needs to be loaded and initialized. Besides calls, accesses to non receiver instance variables is possible in Java. Such accesses are also performed with a slow path (null check). Porting the partial read barrier to Java requires to find a solution to fold the read barrier also in slow paths such as null checks and maybe ignoring the read barrier for some calls (static methods cannot access a receiver's fields, so no read barrier seems to be needed).
+\DIFaddbegin \DIFadd{Porting the partial read barrier to other languages requires to design efficient ways of folding the read barrier into the uncommon paths of each operation accessing memory. In the example of Java, various method calls (private method calls, static calls, constructor calls) are performed without a look-up. The approach of folding the read barrier in the uncommon path of look-up cache miss to guarantee that the receiver is not a forwarding object is therefore not possible. However, such calls also feature a slower uncommon path: private method calls take a slow path when the receiver is null, static and constructor call when the class implementing the method called needs to be loaded and initialized. Besides calls, accesses to non receiver instance variables is possible in Java. Such accesses are also performed with a slow path (null check). Porting the partial read barrier to Java requires to find a solution to fold the read barrier also in slow paths such as null checks and maybe ignoring the read barrier for some calls (static methods cannot access a receiver's fields, so guarantees on the receiver are irrelevant).
 }
 
 \DIFaddend %REDUC DLS
@@ -1271,7 +1271,7 @@ OpenJDK's Shenandoah \cite{Shenandoah} tries to mitigates Brooks forwarding poin
 
 \DIFadd{In Shenandoah~\mbox{%DIFAUXCMD
 \cite{Shenandoah}}\hspace{0pt}%DIFAUXCMD
-, a concurrent GC phase starts to update the pointers to moved objects once compaction is finished. This approach contrasts with our implementation, where the GC holds to memory until the end of the next GC marking phase. We implemented our approach in such way because the marking phase was already removing forwarding objects, so it could remove the extra forwarding objects created by the GC with very limited GC throughput overhead. The throughput overhead is mitigated in Shenandoah by using concurrent GC threads and their approach saves a bit of memory in between compacting GCs}\DIFaddend .
+, a concurrent GC phase updates pointers to moved objects immediately after the end of compaction. This approach contrasts with our implementation, where the GC holds to memory until the end of the next GC marking phase. We implemented our approach in such way because the marking phase was already removing forwarding objects, so it could remove the extra forwarding objects created by the GC with very limited GC throughput overhead. The throughput overhead is mitigated in Shenandoah by using concurrent GC threads and their approach saves a bit of memory in between compacting GCs}\DIFaddend .
 
 \paragraph{Software Write Barrier.}
 P. Cheng and G. E. Blelloch \cite{WBConcCompactNew} implemented a concurrent compactor inspired by Baker's read barrier \cite{BakerReadBarrier}, but based on the work of Scott Nettles and James O Toole \cite{WBConcCompactOld}; they moved the invariant from the to-space to the from-space, allowing the use of a write barrier instead of a read barrier. 

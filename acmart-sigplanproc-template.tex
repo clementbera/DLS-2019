@@ -1,5 +1,5 @@
 %% For double-blind review submission, w/o CCS and ACM Reference (max submission space)
-\documentclass[sigplan,10pt,review,anonymous]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+\documentclass[sigplan,10pt,screen]{acmart}\settopmatter{printfolios=true,printccs=true,printacmref=true}
 %% For double-blind review submission, w/ CCS and ACM Reference
 %\documentclass[sigplan,review,anonymous]{acmart}\settopmatter{printfolios=true}
 %% For single-blind review submission, w/o CCS and ACM Reference (max submission space)
@@ -13,17 +13,20 @@
 %% Conference information
 %% Supplied to authors by publisher for camera-ready submission;
 %% use defaults for review submission.
-\acmConference[DLS'19]{Dynamic Languages Symposium}{October 22, 2019}{Athens, Greece}
+\acmBooktitle{Proceedings of the 15th ACM SIGPLAN International Symposium on Dynamic Languages (DLS '19), October 20, 2019, Athens, Greece}
+\acmConference[DLS '19]{Proceedings of the 15th ACM SIGPLAN International Symposium on Dynamic Languages}{October 20, 2019}{Athens, Greece}
 \acmYear{2019}
-\acmISBN{} % \acmISBN{978-x-xxxx-xxxx-x/YY/MM}
-\acmDOI{} % \acmDOI{10.1145/nnnnnnn.nnnnnnn}
+\acmISBN{978-1-4503-6996-1/19/10} % \acmISBN{978-x-xxxx-xxxx-x/YY/MM}
+\acmDOI{10.1145/3359619.3359741} % \acmDOI{10.1145/nnnnnnn.nnnnnnn}
 \startPage{1}
 
 %% Copyright information
 %% Supplied to authors (based on authors' rights management selection;
 %% see authors.acm.org) by publisher for camera-ready submission;
 %% use 'none' for review submission.
-\setcopyright{none}
+\setcopyright{acmlicensed}
+\acmPrice{15.00}
+\copyrightyear{2019}
 %\setcopyright{acmcopyright}
 %\setcopyright{acmlicensed}
 %\setcopyright{rightsretained}
@@ -51,7 +54,6 @@
 %% '\documentclass' and topmatter commands above; see
 %% 'acmart-pacmpl-template.tex'.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 %% Some recommended packages.
 \usepackage{booktabs}   %% For formal tables:
@@ -179,8 +181,8 @@ We evaluate our technique on a suite of high workload (2 to 14Gb) benchmarks bui
 <concept_significance>500</concept_significance>
 </concept>
 <concept>
-<concept_id>10011007.10010940.10011003.10011002</concept_id>
-<concept_desc>Software and its engineering~Software performance</concept_desc>
+<concept_id>10011007.10011006.10011008.10011009.10011011</concept_id>
+<concept_desc>Software and its engineering~Object oriented languages</concept_desc>
 <concept_significance>300</concept_significance>
 </concept>
 <concept>
@@ -191,8 +193,9 @@ We evaluate our technique on a suite of high workload (2 to 14Gb) benchmarks bui
 </ccs2012>
 \end{CCSXML}
 
-\ccsdesc[500]{Software and its engineering~General programming languages}
-\ccsdesc[300]{Social and professional topics~History of programming languages}
+\ccsdesc[500]{Software and its engineering~Runtime environments}
+\ccsdesc[300]{Software and its engineering~Object oriented languages}
+\ccsdesc[300]{Software and its engineering~Just-in-time compilers}
 %% End of generated code
 
 
@@ -320,6 +323,7 @@ Recent versions of Oracle's JVM feature a compacting GC as the default garbage c
 In this paper, we propose an alternative solution to decrease compaction pauses. During a stop the world pause, our GC compacts part of the heap and maintains a few invariants but does \emph{not} update at all references to moved objects in the heap. Instead, while compacting the GC replaces the previous location of the moved objects by low-overhead software forwarding objects~\cite{Forwarders}. Thanks to the invariants maintained during the stop the world pause, the forwarding objects do not require the mutator to use a read barrier in most memory reads. The forwarding objects are then lazily removed by the mark phase of the following garbage collection, which can be performed incrementally or concurrently. Our implementation solves the compaction pause problem met by one of our industrial user. We describe in Section \ref{sec:validation} how we built benchmarks derived from the industrial use-case to evaluate the compaction pauses. %Maintaining stack invariants to create forwarding objects implies however that our forwarding objects cannot be created atomically, forbidding current compaction.
 
 The contributions of this paper are:
+\vspace{-0.08cm}
 \begin{itemize}
 \item The design of a novel low pause stop the world compaction algorithm, where the references to compacted objects are updated lazily by the mutators and during the following garbage collection mark phase instead of during the compaction pause. 
 \item The design of optimizations applicable to the forwarding objects implementation described in ~\cite{Forwarders} to decrease their runtime overhead.
@@ -450,7 +454,7 @@ The key architectural ideas are:
 \begin{itemize}
 	\item By making objects large enough to hold at least one field, all objects can become forwarding objects. 
 	\item Virtual calls (i.e. message sends to objects) provide a cheap implicit read barrier.
-	\item The VM's fixed-sized stack zone allows for cheap bounded time scanning to eliminate the read barrier on instance variable accesses, which are the most common memory reads.
+	\item The VM's fixed-sized stack zone allows for cheap, bounded time scanning to eliminate the read barrier on instance variable accesses, which are the most common memory reads.
 \end{itemize}
 
 	%\footnote{Our VM uses a small fixed size stack zone, in general stack sizes are many orders of magnitude smaller than heap sizes, SPACE CONSTRAINTso scanning the stack(s) for forwarding objects is relatively inexpensive.}
@@ -462,11 +466,14 @@ Object headers contain a class index (an index into a sparse table of classes) i
 % \footnote{Our scheme is still feasible for object representations using a full class pointer; one simply uses a distinguished value for the forwarding object class, such as an immediate.}
 
 \paragraph{Partial Read Barrier and Invariants.} 
-To intercept virtual calls to forwarding objects, the forwarding object class index is never entered in method lookup caches and look-ups to forwarding objects are never successful. When performing a virtual call, the VM checks if the receiver is a forwarding object only on cache miss and look-up failures, which are uncommon. By following\footnote{We call following a forwarding object the action of replacing a reference to the forwarding object to the object it forwards to.} the forwarding object on the uncommon path, the receiver is guaranteed not to be a forwarding object at method activation time. Effectively virtual call binding provides an implicit read barrier.
+To intercept virtual calls to forwarding objects, the forwarding object class index is never entered in method lookup caches and look-ups to forwarding objects are never successful. When performing a virtual call, the VM checks if the receiver is a forwarding object only on cache miss and look-up failures, which are uncommon. By following\footnote{We call following a forwarding object the action of replacing a reference to the forwarding object to the object it forwards to.} the forwarding object on the uncommon path, the receiver is guaranteed not to be a forwarding object at method activation time. 
 
+The virtual machine caches virtual calls look-up results essentially using inline caches~\cite{PICSelf}. Inline caches can be monomorphic (a single type to test), polymorphic (up to 6 cases to test) or megamorphic (the VM attempts three times to find the result using a hash based logic). If the look-up is not resolved in the inline cache, the VM tries up to three times to find the result in a global look-up cache using a hash based logic. If this fails again, the VM performs a look-up algorithm and only if no method is found (the method to find is not implemented), the test against forwarding objects is performed. Results found on inline and global cache misses are used respectively to update the inline and the global look-up cache. Although the time spent in the partial read barrier depends on the current inline cache state, the time spent is bounded to a fixed number of tests, the worst case being six tests in the polymorphic inline cache followed by three tests in the global look-up cache. Effectively virtual call binding provides a cheap implicit read barrier.
+
+\paragraph{Invariants.}
 To keep the read barrier partial, the VM maintains a set of invariants valid at all times except during the creation of forwarding objects~\cite{Forwarders}. Specific fields on stack referencing the frame's receiver or the compiled code object holding the bytecode executed by the interpeter are scanned and forwarding objects found are updated. Besides the stack, specific fixed-sized structures known by the VM need to be scanned for forwarding objects. These structures are specific interpreter variables, objects related to process scheduling and fixed-sized caches. 
 
-The total execution time spent to maintain these invariants is bounded. The stack has a fixed size: when no more space is available, least recently used stack pages are serialized on heap. Serialized pages are checked for forwarding objects during materialization and not during forwarding object creation. The only variable size structure scanned during forwarding object creation is the list of running processes (Processes are represented as objects and cannot be forwarding objects), which is usually a small list. No structure scanned is proportional to the heap size.
+The total execution time spent to maintain these invariants is bounded. The stack has a fixed size: when no more space is available, least recently used stack pages are serialized on heap. Serialized pages are checked for forwarding objects during materialization and not during forwarding object creation. The only variable size structure scanned during forwarding object creation is the list of running processes, which is usually a small list. No structure scanned is proportional to the heap size.
 
 %all the compiled code and class objects referenced by the look-up caches cannot be forwarding objects. Last
 % 
@@ -496,7 +503,7 @@ Although forwarding objects are followed when met at runtime, some references ma
 
 %\paragraph{Implementation.} The initial implementation \cite{Forwarders} was implemented in \OpenSmalltalkVM\footnote{https://github.com/OpenSmalltalk/opensmalltalk-vm}. The work described here extends the system to provide a low pause compaction algorithm. We note that although \OpenSmalltalkVM's GC is generational, our work is focused on the old space collector. We therefore omit discussions on the scavenger and use directly the term GC to discuss the old space collector.
 
-\paragraph{Implementation.} Forwarding objects have been implemented in the \OpenSmalltalkVM\footnote{https://github.com/OpenSmalltalk/opensmalltalk-vm}, a VM for dynamic object-oriented languages in the Smalltalk family.
+\paragraph{Implementation.} Forwarding objects are implemented in the \OpenSmalltalkVM\footnote{https://github.com/OpenSmalltalk/opensmalltalk-vm}, a VM for dynamic object-oriented languages in the Smalltalk family.
 %\footnote{That work was focussed on efficient support of object schema evolution in a system with direct pointers.}.
 Our novel compaction algorithm is also implemented in the \OpenSmalltalkVM. 
 More concretely, this work changed the existing implementation in the VM of (1) forwarding objects and (2) the GC. 
@@ -559,7 +566,8 @@ This is depicted as a region E with a pink background.
 %If no region is reserved, the VM allocates a new one, or throws an out of memory error during step 2.
 
 %\egb{check whether you want VM or GC in this text. You used them both interchangeable. for example, I thought it is the algorithm which computes the regions to compact.}
-\paragraph{Phase 2. Compaction Phase (Garbage Collection N).} The GC computes which memory regions to compact based on its occupancy. Regions are selected from the least occupied up until enough regions have been selected to fill up a reserved empty region to compact into. Regions which are more occupied than a threshold (70\% by default in our implementation) will not be compacted.
+\paragraph{Phase 2. Compaction Phase (Garbage Collection N).} \hfill \\ 
+The GC computes which memory regions to compact based on its occupancy. Regions are selected from the least occupied up until enough regions have been selected to fill up a reserved empty region to compact into. Regions which are more occupied than a threshold (70\% by default in our implementation) will not be compacted.
 If all regions are almost full, the GC does not compact an almost full region into the region to compact into, but instead it skips entirely the compaction phase.
 The GC ensures a memory region to compact into was reserved, otherwise it allocates a new one, or it aborts compaction if the allocation of a new memory region is impossible.
 
@@ -574,7 +582,7 @@ Figure~\ref{fig:Algo} shows that the algorithm selected the three least occupied
 \paragraph{Phase 3. Mutator Running.}  At the end of the compaction phase, all the compacted regions now contain only forwarding objects and the free chunks present inside them cannot be allocated. 
 The mutator can run without using the compacted memory regions, aside from forwarding objects which are followed when met at runtime. In the figure, these regions are shown with the letter U (unoccupied, aside from forwarding objects).
 
-\paragraph{Phase 4. End of Mark Phase (Garbage Collection N+1).} During the mark phase, the GC follows all forwarding objects. Memory regions marked as being compacted from the previous full GC can now be freed since they contained only forwarding objects, which are no longer referenced, and non allocatable free chunks. One of the unoccupied regions is reserved so that the next compaction phase can compact into it.
+\paragraph{Phase 4. End of Mark Phase (Garbage Collection N+1).} During the mark phase, the GC follows all forwarding objects. Memory regions marked as being compacted from the previous full GC can now be freed since they contained only forwarding objects, which are no longer referenced, and non allocatable free chunks. One of the unoccupied regions is reserved for the next compaction phase can compact into it.
 
 Figure~\ref{fig:Algo} shows that one of the F regions, now empty, is reserved (E with pink background) while the two others are also freed (E), but can be directly re-used by the VM. Once the sweep phase terminates, the algorithm goes back to phase 1.
 
@@ -593,17 +601,14 @@ tight loops where each iteration of the loop requires to take a slow path to fol
 
 %The original 2015 design ~\cite{Forwarders} suffered from such cases.  
 
-As a concrete example consider a method computing the sum of all the values present in an array passed as an argument. Figure \ref{fig:code} shows such an example. The code simply initializes the local variable \texttt{sum}, iterates over the array and add the value of the current item of the array to the sum. Lastly, the method answers the sum computed. 
+As a concrete example consider a method computing the sum of all the values present in an array passed as an argument. Figure \ref{fig:code} shows such an example. The code simply initializes the instance variable \texttt{sum}, iterates over the array and add the value of the current item of the array to the sum.
 
 \begin{figure}[bth]
-		\vspace{-0.1cm}
+		%\vspace{-0.28cm}
 \begin{verbatim}
-sum: array
-  | sum |
   sum := 0.
   1 to: array size do: 
-    [:i | sum := sum + (array at: i)].
-  ^ sum
+     [:i | sum := sum + (array at: i)].
 \end{verbatim}
 		\vspace{-0.3cm}
 		\caption{Pathological Smalltalk Case\vspace{-0.3cm}}
@@ -635,11 +640,9 @@ In this section, we first give an overview of the validation and discuss the ben
 
 In this paper we claim that (1) not updating pointers during compaction pauses decreases significantly the pause times and (2) that the overhead introduced by the forwarding objects of our approach is very limited. To validate these claims, we need to compare our approach against another approach which updates pointers during the compaction pause and does not introduce forwarding objects similar to Garbage First \cite{G1}. 
 %Such a competitive approach is very similar to Garbage First \cite{G1}. We however built our approach on top of existing work \cite{Forwarders}, re-using the same framework, \OpenSmalltalkVM. 
-Since there is no such a thing as a Garbage First implementation in \OpenSmalltalkVM, we built a poor man's version of it\footnote{%One may wonder why the new algorithm was not implemented and evaluated in the JVM context, e.g. in Jikes RVM. 
-%We did not consider pursuing this evaluation strategy 
-We did not evaluate our approach Jikes RVM, typically used for high performance GC evaluation, because Jikes is currently 32 bits only, forbidding experiments on 10Gb heaps, %making it impossible to conduct experiments on the size of heaps we target %(over 10 Gb), 
-%forbidding the use of heaps over 10Gb for evaluation%and as such it is not possible to conduct experiments on the size of heaps we target in this paper
-and it does not feature the partial read barrier described in~\cite{Forwarders} we built upon, which would need to be re-implemented.}.
+Since there is no such a thing as a Garbage First implementation in \OpenSmalltalkVM, we built a poor man's version of it
+%\footnote{
+%We note that we did not evaluate our approach with Jikes RVM, typically used for high performance GC evaluation. We did not because Jikes is currently 32 bits only, forbidding experiments on 10Gb heaps, and Jikes RVM does not feature the partial read barrier described in~\cite{Forwarders} we built upon, which would need to be re-implemented.}.
 In the next paragraphs we briefly describe the two approaches compared, our approach, %that we call 
 lazy pointer update, and %the competitive, 
 Garbage First style approach, %that we call 
@@ -994,13 +997,14 @@ In this experiment, we ran the same benchmarks as the previous subsection with t
 
 \paragraph{Results.} In the Load benchmark, 1.78 millions of forwarding objects are created across 12 GCs. 2.55 millions of references needs to be updated across the benchmark to avoid referencing forwarding objects. In the case of eager pointer update, the time spent updating these references is spread across the twelve compaction pauses. In the case of lazy pointer update, 628 thousands of references are updated lazily when met at runtime, while the rest of the references are updated through the next GC marking phase. The Load benchmark is specific because almost one quarter of the references are updated at runtime with our algorithm, lazy pointer update. In the two other benchmarks, most references to forwarding objects are unused at runtime: they are updated by the following GC marking phase before being accessed. This makes sense since for example in the ExpCache benchmark the heap contains around 21 millions objects and only approximately 8 thousands of them (0.038\%) are converted to forwarding object on compaction pauses.
 
-\paragraph{Execution Time Overhead.} We estimated with a micro-benchmark that the time spent updating a forwarding object met at runtime to an order of magnitude of ten nanoseconds. More concretely, it  accounts the time spent exiting the code generated by the JIT to go to C code due to the forwarding object met, executing the C code to follow with heuristics fields of different objects to avoid looping repeatedly on the same forwarding object and lastly resuming execution of the code generated by the JIT. Even in the Load benchmark, where 628 thousands of references are updated lazily when met at runtime, the total execution time overhead of such updates is estimated to 6 milliseconds in a benchmark taking approximately 49.5 seconds and a standard deviation of 500 milliseconds. The overhead of lazy update is therefore negligible and hard to see in the total execution time without GC of the benchmark.
+\paragraph{Execution Time Overhead.} We estimated with a micro-benchmark that the time spent updating a forwarding object met at runtime to an order of magnitude of ten nanoseconds. More concretely, it  accounts the time spent exiting the code generated by the JIT to go to C code due to the forwarding object met, executing the C code to follow with heuristics fields of different objects to avoid looping repeatedly on the same forwarding object and lastly resuming execution of the code generated by the JIT. Even in the Load benchmark, where ~628,000 references are updated lazily when met at runtime, the total execution time overhead of such updates is estimated to 6 ms in a benchmark taking approximately 49.5 s and a std of 500 ms. The overhead of lazy update is therefore negligible and hard to see in the total execution time without GC of the benchmark.
 
 
 \section{Threats to Validity and Discussion}
 \label{sec:threats}
 
-We believe the validation is very strong, but specific concerns may threaten its validity: the representativity of our benchmarks, the experimental eager pointer update implementation and the compaction heuristics. These aspects are detailed in this section. Then, we discuss the memory pressure of the compacting algorithm and the applicability of our approach to other VMs.
+We believe the validation is very strong, but specific concerns may threaten its validity. %: the representativity of our benchmarks, the experimental eager pointer update implementation and the compaction heuristics. These aspects are detailed in this section. 
+Then, we discuss the memory pressure of the compacting algorithm and the applicability of our approach to other VMs.
 
 \subsection{Threats to Validity}
 
@@ -1062,14 +1066,13 @@ However, it matters in the case of eager pointer update. The high maximum pause 
 
 \subsection{Optimizing JITs} 
 \label{sec:optJITDisc}
-A final threat to validity is the effect of the JIT compiler. The \OpenSmalltalkVM JIT compiler is essentially a template-based JIT compiler. The template JIT, aside from very specific cases, does not remove object allocations. 
+The impact of the JIT on object demography is the final threat to validity. The \OpenSmalltalkVM JIT compiler is essentially a template-based JIT and does not remove object allocations. 
 %or perform loop invariant code motion. 
 %Since it has been the production JIT for a long time, minor optimizations have been implemented on top, including a few which remove some object allocations in specific cases. However, we do not claim our JIT competes with the production JITa of VMs such as the Java HotSpot C2 compiler, or the JavaScript V8 CrankShaft/Turbofan compilers. 
-
-Some JITs, such as the Java Hotspot C2 compiler or the JavaScript V8 CrankShaft/Turbofan compilers perform much more aggressive optimizations, which can lead in some methods to avoiding entirely the allocation of some objects in the common execution path and to hoist ahead of loops a significant number of instructions.
+Some JITs, such as the Java Hotspot C2 compiler, perform much more aggressive optimizations. Such optimizations may avoid entirely the allocation of some objects in the common execution path. %and to hoist ahead of loops a significant number of instructions.
 
 %\paragraph{Allocation folding.}
-Object demography might differ from what we observe with such JITs and the impact on compaction pauses has yet to be confirmed as being similar. However, in practice such optimizing JITs remove mainly (if not only) allocations of short-lived objects, which do not escape an optimization unit. Short-lived objects usually never survive until they are moved to old space, so the impact on the old space collector should be minimal. 
+Object demography might differ from what we observed in the paper with such JITs. The impact on compaction pauses has to be evaluated. However, in practice such optimizing JITs remove mainly allocations of short-lived objects, which do not escape an optimization unit. Short-lived objects usually never survive until they are moved to old space, so the impact on the old space collector should be minimal. 
 
 %\OpenSmalltalkVM also features a JIT with speculative optimizations, but it is available only under an experimental flag.  Early experiments with our experimental speculative optimizer seem to confirm this theory.
 
@@ -1086,9 +1089,6 @@ Object demography might differ from what we observe with such JITs and the impac
 %In this section we discuss the memory pressure of our compacting algorithm and the applicability of our approach to other VMs. % and a few other details worth mentioning.
 
 %\todo{a. How to guarantee very low-overhead when having bigger lookup caches. -> What should I do? I guess what they mean is when  look-up cache failure becomes common? I've never seen that happening.  I do not understand how lookup cache size and PRB are related. Should I explain that they are not?}
-
-\paragraph{Large look-up caches.}
-The virtual machine caches look-up results essentially using inline caches~\cite{PICSelf}. Inline caches can be monomorphic (a single type to test), polymorphic (up to 6 cases to test) or megamorphic (the VM attempts three times to find the result using a hash based logic). If the look-up is not resolved in the inline cache, the VM tries up to three times to find the result in a global look-up cache using a hash based logic. If this fails again, the VM performs a look-up algorithm and only if no method is found (the method to find is not implemented), the test against forwarding objects is performed. Results found on inline cache misses are used to update the inline cache. Results found on global look-up cache misses are also used to update the global look-up cache. Although the time spent in the partial read barrier depends on the current inline cache state, the time spent is bounded to a fixed number of test, the worst case being six tests in the polymorphic inline cache and three checks in the global look-up cache. 
 
 \paragraph{Memory Pressure.}
 The compacting algorithm requires the VM to use extra memory regions. Indeed, some memory regions (The U regions in the Figure \ref{fig:Algo}) are used just to hold forwarding objects and unused memory while the mutator is running. These regions pressure the allocator and the VM uses a few more memory regions with the new algorithm. However, the number of extra memory region used is proportional to the number of compacted segments and can be bound, it is not proportional to the size of the heap. %REDUC DLS We therefore believe it is possible to make the new algorithm scale without too much trouble.
@@ -1112,7 +1112,7 @@ In addition, the algorithm relies on the partial read barrier to have efficient 
 
 Although we believe it is possible to implement such the partial read barrier for other languages, it has yet to be proven. The partial read barrier relies on folding the read barrier in uncommon paths to avoid paying its cost in the common case. In the context of virtual calls, the read barrier is folded in \OpenSmalltalkVM into the look-up cache miss uncommon path. Since in Smalltalk most operations are performed through virtual calls, the read barrier is implicit and overhead-free in the common case. 
 
-Porting the partial read barrier to other languages requires to design efficient ways of folding the read barrier into the uncommon paths of each operation accessing memory. In the example of Java, various method calls (private method calls, static calls, constructor calls) are performed without a look-up. The approach of folding the read barrier in the uncommon path of look-up cache miss to guarantee that the receiver is not a forwarding object is therefore not possible. However, such calls also feature a slower uncommon path: private method calls take a slow path when the receiver is null, static and constructor call when the class implementing the method called needs to be loaded and initialized. Besides calls, accesses to non receiver instance variables is possible in Java. Such accesses are also performed with a slow path (null check). Porting the partial read barrier to Java requires to find a solution to fold the read barrier also in slow paths such as null checks and maybe ignoring the read barrier for some calls (static methods cannot access a receiver's fields, so no read barrier seems to be needed).
+Porting the partial read barrier to other languages requires to design efficient ways of folding the read barrier into the uncommon paths of each operation accessing memory. In the example of Java, various method calls (private method calls, static calls, constructor calls) are performed without a look-up. The approach of folding the read barrier in the uncommon path of look-up cache miss to guarantee that the receiver is not a forwarding object is therefore not possible. However, such calls also feature a slower uncommon path: private method calls take a slow path when the receiver is null, static and constructor call when the class implementing the method called needs to be loaded and initialized. Besides calls, accesses to non receiver instance variables is possible in Java. Such accesses are also performed with a slow path (null check). Porting the partial read barrier to Java requires to find a solution to fold the read barrier also in slow paths such as null checks and maybe ignoring the read barrier for some calls (static methods cannot access a receiver's fields, so guarantees on the receiver are irrelevant).
 
 %REDUC DLS
 %\subsection{Implementation Considerations}
@@ -1184,7 +1184,7 @@ With Baker's design, each time a mutator reads an object, it checks if the addre
 Some GCs with concurrent compaction use Brooks forwarding pointers~\cite{MetronomeIBMGC,RTGCBrooksReadBarrier,Shenandoah}.
 OpenJDK's Shenandoah \cite{Shenandoah} tries to mitigates Brooks forwarding pointer overhead through additional optimizations in the JIT which remove the read barriers. Such additional optimizations reduce the read barrier overhead from up to 40\% down to 10 or 20\% depending on benchmarks. In the Chicken and Clover GCs \cite{RTConcCompactGC}, the mutator uses Brooks forwarding pointers in Chicken, while it uses a conditional Baker-style read barrier in Clover.
 
-In Shenandoah~\cite{Shenandoah}, a concurrent GC phase starts to update the pointers to moved objects once compaction is finished. This approach contrasts with our implementation, where the GC holds to memory until the end of the next GC marking phase. We implemented our approach in such way because the marking phase was already removing forwarding objects, so it could remove the extra forwarding objects created by the GC with very limited GC throughput overhead. The throughput overhead is mitigated in Shenandoah by using concurrent GC threads and their approach saves a bit of memory in between compacting GCs.
+In Shenandoah~\cite{Shenandoah}, a concurrent GC phase updates pointers to moved objects immediately after the end of compaction. This approach contrasts with our implementation, where the GC holds to memory until the end of the next GC marking phase. We implemented our approach this way because the marking phase was already removing forwarding objects, so it could remove the extra forwarding objects created by the GC with very limited GC throughput overhead and low engineering effort. The throughput overhead is mitigated in Shenandoah by using concurrent GC threads and their approach saves a bit of memory in between compacting GCs.
 
 \paragraph{Software Write Barrier.}
 P. Cheng and G. E. Blelloch \cite{WBConcCompactNew} implemented a concurrent compactor inspired by Baker's read barrier \cite{BakerReadBarrier}, but based on the work of Scott Nettles and James O Toole \cite{WBConcCompactOld}; they moved the invariant from the to-space to the from-space, allowing the use of a write barrier instead of a read barrier. 
@@ -1219,8 +1219,8 @@ However, these instructions are disabled on many processors currently in use due
 Azul's C4 GC \cite{AzulVirtualMemConcCompact} features concurrent compaction on x86 and Linux using page protection to implement the read barrier. In theory, it should be possible to port it to other OSs and processors, but in practice it requires significant engineering effort. To support Linux and x86, the virtual and physical memory management of Linux for x86 was rewritten (OS changes) by the GC engineers to support the high rate of virtual memory operations required by the GC. Support for other OSs and processors would require a similar engineering effort.
 Aside from Azul's C4 GC, garbage collector in \cite{CompressorVirtualMemConcCompact} also features concurrent compaction using page protection.
 
-\paragraph{Constrained Software Implementation.}
-Finally, concurrent compaction can also be implemented using special runtime assumptions. For example, Schism \cite{SchismRTGC} is mainly a non-moving real-time GC, but specific data structures called array spines are managed by a concurrent compacting GC. Since the runtime has assumptions on how the array spines are accessed, it can perform a fully concurrent compaction without concurrency issues.
+%\paragraph{Constrained Software Implementation.}
+%Finally, concurrent compaction can also be implemented using special runtime assumptions. For example, Schism \cite{SchismRTGC} is mainly a non-moving real-time GC, but specific data structures called array spines are managed by a concurrent compacting GC. Since the runtime has assumptions on how the array spines are accessed, it can perform a fully concurrent compaction without concurrency issues.
 %\egb{add here 1 sentence comparing to your approach}
 
 \section{Conclusion}
